@@ -2,8 +2,11 @@ export const DAY_MS = 86_400_000;
 export const SEASON_DAYS = 30;
 export const SEASON_MS = SEASON_DAYS * DAY_MS;
 
-/** Length of one game, in milliseconds. */
-export const GAME_MS = 5 * 60 * 1000;
+/** Game length, in minutes: picked before each game and remembered per device. */
+export const GAME_MINUTES_MIN = 1;
+export const GAME_MINUTES_MAX = 10;
+export const GAME_MINUTES_DEFAULT = 5;
+export const GAME_MINUTES_QUICK = [1, 3, 5, 10] as const;
 
 /** Avatar colours, assigned by player creation order. */
 export const PLAYER_COLORS = [

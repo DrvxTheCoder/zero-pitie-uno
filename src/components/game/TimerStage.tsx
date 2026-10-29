@@ -11,12 +11,14 @@ import { TimeBlocks } from "./TimeBlocks";
 
 export function TimerStage({
   secondsLeft,
+  totalSeconds,
   phase,
   paused,
   onTogglePause,
   onFinish,
 }: {
   secondsLeft: number;
+  totalSeconds: number;
   phase: Phase;
   paused: boolean;
   onTogglePause: () => void;
@@ -26,8 +28,8 @@ export function TimerStage({
   return (
     <>
       <PhaseLabel phase={phase} />
-      <RollingDigits secondsLeft={secondsLeft} phase={phase} paused={paused} />
-      <TimeBlocks secondsLeft={secondsLeft} />
+      <RollingDigits secondsLeft={secondsLeft} totalSeconds={totalSeconds} phase={phase} paused={paused} />
+      <TimeBlocks secondsLeft={secondsLeft} totalSeconds={totalSeconds} />
       <div className="flex flex-wrap justify-center gap-3">
         <Button variant="ink" onClick={onTogglePause}>
           {paused ? <PlayIcon /> : <PauseIcon />}

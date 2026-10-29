@@ -55,7 +55,7 @@ export function BoardView({ snapshot }: { snapshot: LeagueSnapshot }) {
     main = (
       <>
         {played.length ? (
-          <Podium top={played.slice(0, 3)} />
+          <Podium top={played.slice(0, 3)} players={players} />
         ) : (
           <EmptyState
             title={t.board.emptyTitle}

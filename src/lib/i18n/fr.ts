@@ -37,6 +37,8 @@ export const fr = {
     scopeSeason: "Saison",
     scopeAll: "Tout temps",
     games: (n: number) => plural(n, "partie", "parties"),
+    /** Suffix after a podium rank: 1er, 2e, 3e. */
+    ordinal: (n: number): string => (n === 1 ? "er" : "e"),
     winRate: "victoires",
     winShort: "V",
     lossShort: "D",
@@ -54,11 +56,18 @@ export const fr = {
     noChampion: (date: string) => `Premier titre décerné le ${date}.`,
     seeAll: "Tout l'historique",
     beat: "bat",
+    victory: "victoire",
+    defeat: "défaite",
   },
 
   game: {
     start: "Démarrer",
-    startSub: "Partie de 5 minutes",
+    startSub: (n: number) => `Partie de ${plural(n, "minute", "minutes")}`,
+    pickTitle: "Durée de la partie",
+    minutes: (n: number) => plural(n, "minute", "minutes"),
+    less: "Une minute de moins",
+    more: "Une minute de plus",
+    go: "C'est parti",
     quick: "Saisir un résultat sans chrono",
     phases: ["Tranquille…", "Ça se réchauffe", "Ça chauffe !", "Zéro pitié !", "Dernières secondes !"],
     pause: "Pause",

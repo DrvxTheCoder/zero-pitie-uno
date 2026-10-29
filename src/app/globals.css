@@ -19,6 +19,12 @@
   --color-orange: #f07f12;
   --color-muted: #6e615c;
   --color-line: #e9dfcf;
+  /* Podium medals (gold uses yellow) */
+  --color-gold-dk: #c99a00;
+  --color-silver: #d6dbe1;
+  --color-silver-dk: #8e97a2;
+  --color-bronze: #e08a4c;
+  --color-bronze-dk: #9c5524;
 
   /* Hard "neo-brutal" offset shadows */
   --shadow-*: initial;
@@ -63,6 +69,10 @@
   --animate-rise: rise 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
   --animate-toast-in: toast-in 0.3s cubic-bezier(0.2, 1.6, 0.4, 1);
   --animate-drop: drop 0.16s cubic-bezier(0.2, 1.4, 0.4, 1);
+  --animate-climb: climb 0.6s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  --animate-pop-in: pop-in 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+  --animate-swing: swing 2.6s ease-in-out infinite;
+  --animate-shine: shine 3.2s ease-in-out infinite;
 
   @keyframes rays { to { transform: translate(-50%, -50%) rotate(360deg); } }
   @keyframes wobble {
@@ -96,6 +106,16 @@
   @keyframes boom { to { opacity: 0; } }
   @keyframes exit-up { to { transform: translateY(-40vh) rotate(-12deg); opacity: 0; } }
   @keyframes rise { from { transform: translateY(60vh) rotate(6deg); } }
+  @keyframes climb { from { transform: translateY(70%); opacity: 0; } }
+  @keyframes pop-in { from { transform: scale(0) rotate(30deg); } }
+  @keyframes swing {
+    0%, 100% { transform: rotate(-7deg); }
+    50% { transform: rotate(7deg); }
+  }
+  @keyframes shine {
+    0%, 55% { transform: translateX(-40px); }
+    85%, 100% { transform: translateX(40px); }
+  }
   @keyframes drop { from { transform: translateY(-6px) scale(0.97); opacity: 0; } }
   @keyframes toast-in { from { transform: translate(-50%, -30px) rotate(-4deg); opacity: 0; } }
 }
@@ -122,6 +142,19 @@
 @layer base {
   :root {
     color-scheme: light;
+  }
+  /*
+   * The document never scrolls: <ScrollRoot> does. With the translucent iOS status bar,
+   * a page shorter than the screen can get a layout viewport shortened by the status-bar
+   * height (fixed bottom nav floats up); the extra inset keeps the document full height.
+   */
+  html,
+  body {
+    height: 100dvh;
+    overflow: hidden;
+  }
+  html {
+    min-height: calc(100% + env(safe-area-inset-top, 0px));
   }
   body {
     margin: 0;

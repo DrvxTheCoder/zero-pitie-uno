@@ -2,6 +2,7 @@
 
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { ArenaBackground } from "@/components/layout/ArenaBackground";
+import { lockScrollRoot } from "@/components/layout/ScrollRoot";
 import type { Phase } from "@/lib/timer-phases";
 
 type Props = {
@@ -21,15 +22,9 @@ type Props = {
   shake?: boolean;
 };
 
-/** Full-screen game layer: red burst background, top bar, centered stage. Locks page scroll. */
+/** Full-screen game layer: red burst background, top bar, centered stage. Locks app scroll. */
 export function OverlayFrame({ phase, paused, flash, spinSeconds, wobbleSeconds = 5, topBar, children, layers, shake }: Props) {
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
+  useEffect(() => lockScrollRoot(), []);
 
   return (
     <div

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ArenaBackground } from "@/components/layout/ArenaBackground";
 import { GrainTexture } from "@/components/layout/GrainTexture";
 import { PressSound } from "@/components/layout/PressSound";
+import { ScrollRoot } from "@/components/layout/ScrollRoot";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   title: "Zéro Pitié League",
   description: "Classement de vos parties d'UNO No Mercy : chrono de 5 minutes, saisons de 30 jours, plusieurs ligues.",
   applicationName: "Zéro Pitié",
-  appleWebApp: { capable: true, title: "Zéro Pitié" },
+  appleWebApp: { capable: true, title: "Zéro Pitié", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false },
 };
 
@@ -29,12 +30,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const lang = await getLang();
   return (
     <html lang={lang} className={`${bowlby.variable} ${rubikDirt.variable} ${rubik.variable}`}>
-      <body className="min-h-dvh overflow-x-hidden bg-red pr-[max(16px,env(safe-area-inset-right,0px))] pb-[env(safe-area-inset-bottom,0px)] pl-[max(16px,env(safe-area-inset-left,0px))] font-body text-[15px] leading-[1.4] text-ink">
+      <body className="bg-red font-body text-[15px] leading-[1.4] text-ink">
         <I18nProvider initialLang={lang}>
           <ToastProvider>
             <GrainTexture />
             <ArenaBackground />
-            {children}
+            <ScrollRoot>{children}</ScrollRoot>
           </ToastProvider>
         </I18nProvider>
         <ServiceWorkerRegister />

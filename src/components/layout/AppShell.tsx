@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 /** Centered content column above the background, leaving room for the phone bottom nav. */
 export function AppShell({ children }: { children: ReactNode }) {
-  return <div className="relative z-1 mx-auto max-w-[1120px] pt-[14px] pb-[128px] desk:pt-5 desk:pb-14">{children}</div>;
+  return <div className="relative z-1 mx-auto max-w-[1120px] pt-4 pb-[128px] desk:pt-5 desk:pb-14">{children}</div>;
 }
 
 /** Two-column board layout on desktop (content + 340px aside), single column on phones. */

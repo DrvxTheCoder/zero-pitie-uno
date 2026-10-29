@@ -4,10 +4,10 @@ import { useGame } from "@/components/game/GameProvider";
 import { PlayIcon } from "@/components/icons";
 import { useI18n } from "@/components/providers/I18nProvider";
 
-/** Big tilted yellow "DÉMARRER — Partie de 5 minutes" call to action. */
+/** Big tilted yellow "DÉMARRER — Partie de 5 minutes" call to action (last chosen length). */
 export function PlayCard() {
   const { t } = useI18n();
-  const { start } = useGame();
+  const { start, minutes } = useGame();
   return (
     <button
       type="button"
@@ -19,7 +19,7 @@ export function PlayCard() {
       }
     >
       <b className="font-display text-[32px] leading-[.95] uppercase">{t.game.start}</b>
-      <span className="font-extrabold">{t.game.startSub}</span>
+      <span className="font-extrabold">{t.game.startSub(minutes)}</span>
       <span className="absolute top-1/2 right-[14px] grid size-16 -translate-y-1/2 rotate-8 place-items-center rounded-full border-3 border-ink bg-ink text-yellow">
         <PlayIcon className="ml-1 size-[30px]" />
       </span>

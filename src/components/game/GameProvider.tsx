@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import { cues, releaseAudioSession, unlockAudio } from "@/lib/sound";
+import { useGameDuration } from "@/hooks/useGameDuration";
+import { cues, releaseAudioSession } from "@/lib/sound";
 import type { PlayerDTO } from "@/lib/types";
 import { QuickEntry } from "./QuickEntry";
 import { TimedGame } from "./TimedGame";
@@ -13,12 +14,14 @@ import { TimedGame } from "./TimedGame";
 type Mode = "timer" | "quick" | null;
 
 type GameContextValue = {
-  /** Open the 5-minute timer. */
+  /** Open the timer (duration picker first). */
   start: () => void;
   /** Open the result sheet without the timer. */
   quickEntry: () => void;
   /** Changes each time a game is saved (lets the board jump back to the season view). */
   savedAt: number;
+  /** Last chosen game length, in minutes. */
+  minutes: number;
 };
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -38,6 +41,7 @@ export function GameProvider({
   const { t } = useI18n();
   const [mode, setMode] = useState<Mode>(null);
   const [savedAt, setSavedAt] = useState(0);
+  const [minutes, setMinutes] = useGameDuration();
 
   useAutoRefresh(mode === null);
 
@@ -47,11 +51,6 @@ export function GameProvider({
         toast(t.board.noPlayersSub, "bad");
         router.push("/players");
         return;
-      }
-      if (next === "timer") {
-        // First thing in the tap: iOS only unlocks audio synchronously inside the gesture.
-        unlockAudio({ playback: true });
-        cues.start();
       }
       setMode(next);
     },
@@ -78,14 +77,23 @@ export function GameProvider({
   );
 
   const value = useMemo(
-    () => ({ start: () => open("timer"), quickEntry: () => open("quick"), savedAt }),
-    [open, savedAt],
+    () => ({ start: () => open("timer"), quickEntry: () => open("quick"), savedAt, minutes }),
+    [open, savedAt, minutes],
   );
 
   return (
     <GameContext.Provider value={value}>
       {children}
-      {mode === "timer" && <TimedGame leagueName={leagueName} players={players} onClose={close} onSaved={handleSaved} />}
+      {mode === "timer" && (
+        <TimedGame
+          leagueName={leagueName}
+          players={players}
+          minutes={minutes}
+          onMinutesChange={setMinutes}
+          onClose={close}
+          onSaved={handleSaved}
+        />
+      )}
       {mode === "quick" && <QuickEntry players={players} onClose={close} onSaved={handleSaved} />}
     </GameContext.Provider>
   );

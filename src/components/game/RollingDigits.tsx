@@ -22,11 +22,29 @@ function DigitColumn({ digit }: { digit: number }) {
   );
 }
 
-/** The big m:ss slab. Wobbles, thumps every second from phase 2, recolours by phase. */
-export function RollingDigits({ secondsLeft, phase, paused }: { secondsLeft: number; phase: Phase; paused: boolean }) {
+/**
+ * The big m:ss slab. Wobbles, thumps every second from phase 2, recolours by phase.
+ * Games of 10 minutes get a tens-of-minutes column for the whole countdown (odometer style).
+ */
+export function RollingDigits({
+  secondsLeft,
+  totalSeconds = secondsLeft,
+  phase,
+  paused,
+  size = "stage",
+}: {
+  secondsLeft: number;
+  /** Game length; decides whether the tens-of-minutes column is shown. */
+  totalSeconds?: number;
+  phase: Phase;
+  paused: boolean;
+  /** "picker": smaller numerals, leaving room for the − / + buttons. */
+  size?: "stage" | "picker";
+}) {
   const digitsRef = useRef<HTMLDivElement>(null);
   const m = Math.floor(secondsLeft / 60);
   const s = secondsLeft % 60;
+  const tens = totalSeconds >= 600;
 
   // Restart the thump animation on every second once it's getting hot
   useEffect(() => {
@@ -52,10 +70,16 @@ export function RollingDigits({ secondsLeft, phase, paused }: { secondsLeft: num
         role="timer"
         aria-label={clock(secondsLeft)}
         className={cn(
-          "flex items-center font-display text-[clamp(84px,27vw,230px)] leading-none transition-colors duration-[400ms]",
+          "flex items-center font-display leading-none transition-colors duration-[400ms]",
+          size === "picker"
+            ? "text-[clamp(52px,14vw,120px)]"
+            : tens
+              ? "text-[clamp(64px,21vw,190px)]"
+              : "text-[clamp(84px,27vw,230px)]",
           phase === 2 || phase === 3 ? "text-paper" : "text-yellow",
         )}
       >
+        {tens && <DigitColumn digit={Math.floor(m / 10)} />}
         <DigitColumn digit={m % 10} />
         <span className={cn("w-[.32em] [transform:translateY(-.06em)] text-center", !paused && "animate-blink")}>:</span>
         <DigitColumn digit={Math.floor(s / 10)} />

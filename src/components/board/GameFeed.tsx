@@ -20,10 +20,10 @@ export function GameFeed({ games, nameOf, now }: { games: GameDTO[]; nameOf: (id
           key={g.id}
           className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 border-t-2 border-dashed border-line py-[9px] first:border-t-0"
         >
-          <time className="min-w-[42px] text-[12px] font-extrabold text-muted tabular-nums">{when(g.playedAt)}</time>
-          <span className="min-w-0 truncate text-[14px] font-semibold">
-            <b className="font-extrabold text-green">{nameOf(g.winnerId)}</b> {t.board.beat}{" "}
-            <i className="font-extrabold text-red not-italic">{nameOf(g.loserId)}</i>
+          <time className="min-w-10.5 text-[12px] font-extrabold text-muted tabular-nums">{when(g.playedAt)}</time>
+          <span className="min-w-0 truncate text-[14px] font-semibold flex flex-row gap-2">
+            <div className="font-extrabold capitalize">{t.board.victory}: <b className="font-extrabold text-green">{nameOf(g.winnerId)}</b></div>
+            <div className="font-extrabold capitalize">{t.board.defeat}: <b className="font-extrabold text-red not-italic">{nameOf(g.loserId)}</b></div>
           </span>
           <span />
         </div>

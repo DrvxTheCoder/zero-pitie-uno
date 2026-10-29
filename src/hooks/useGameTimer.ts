@@ -1,25 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GAME_MS } from "@/lib/constants";
 import { cues } from "@/lib/sound";
 import { phaseOf, type Phase } from "@/lib/timer-phases";
 
 type Options = {
+  /** Game length, in seconds. */
+  totalSeconds: number;
   /** Called once when the countdown reaches zero (or "Finish" is used), with seconds actually played. */
   onTimesUp: (playedSeconds: number) => void;
 };
 
 /**
- * 5-minute countdown driven by requestAnimationFrame against a fixed end time,
+ * Countdown of `totalSeconds`, driven by requestAnimationFrame against a fixed end time,
  * so it stays accurate when the tab is throttled. Also handles per-second sound
  * cues, pause (button or space bar) and keeping the screen awake.
  */
-export function useGameTimer({ onTimesUp }: Options) {
-  const [secondsLeft, setSecondsLeft] = useState(GAME_MS / 1000);
+export function useGameTimer({ totalSeconds, onTimesUp }: Options) {
+  const totalMs = totalSeconds * 1000;
+  const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [paused, setPaused] = useState(false);
 
-  const state = useRef({ endAt: 0, remaining: GAME_MS, running: true, done: false, raf: 0 });
+  const state = useRef({ endAt: 0, remaining: totalMs, running: true, done: false, raf: 0 });
   const onTimesUpRef = useRef(onTimesUp);
   onTimesUpRef.current = onTimesUp;
 
@@ -29,8 +31,8 @@ export function useGameTimer({ onTimesUp }: Options) {
     if (s.running) s.remaining = Math.max(0, s.endAt - performance.now());
     s.done = true;
     cancelAnimationFrame(s.raf);
-    onTimesUpRef.current(Math.round((GAME_MS - s.remaining) / 1000));
-  }, []);
+    onTimesUpRef.current(Math.round((totalMs - s.remaining) / 1000));
+  }, [totalMs]);
 
   // Main loop
   useEffect(() => {
@@ -62,7 +64,7 @@ export function useGameTimer({ onTimesUp }: Options) {
   }, []);
 
   // Sound cues, once per second
-  const phase = phaseOf(secondsLeft);
+  const phase = phaseOf(secondsLeft, totalSeconds);
   const lastPhase = useRef<Phase | -1>(-1);
   useEffect(() => {
     if (secondsLeft <= 0 || state.current.done) return;
