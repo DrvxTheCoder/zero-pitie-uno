@@ -1,0 +1,13 @@
+services:
+  zeropitie:
+    build: .
+    restart: unless-stopped
+    ports: ["3000:3000"]
+    environment:
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}
+      TZ: ${TZ:-Africa/Dakar}
+    volumes: ["zp-data:/app/data"]
+volumes:
+  zp-data:

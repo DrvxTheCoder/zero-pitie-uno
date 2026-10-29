@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model League {
+  id        String    @id @default(uuid())
+  name      String
+  nameKey   String    @unique
+  passHash  String
+  createdAt DateTime  @default(now())
+  players   Player[]
+  games     Game[]
+  sessions  Session[]
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  leagueId  String
+  league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  wins      Game[]   @relation("winner")
+  losses    Game[]   @relation("loser")
+
+  @@index([leagueId])
+}
+
+model Game {
+  id        String   @id @default(uuid())
+  leagueId  String
+  league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  winnerId  String
+  winner    Player   @relation("winner", fields: [winnerId], references: [id], onDelete: Cascade)
+  loserId   String
+  loser     Player   @relation("loser", fields: [loserId], references: [id], onDelete: Cascade)
+  playedAt  DateTime @default(now())
+  durationS Int      @default(0)
+
+  @@index([leagueId, playedAt])
+}
+
+model Session {
+  token     String   @id
+  leagueId  String
+  league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([leagueId])
+}
+
+model Admin {
+  id        String         @id @default(uuid())
+  username  String         @unique
+  passHash  String
+  createdAt DateTime       @default(now())
+  sessions  AdminSession[]
+}
+
+model AdminSession {
+  token     String   @id
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
