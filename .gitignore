@@ -8,3 +8,6 @@ data
 src/generated
 next-env.d.ts
 *.tsbuildinfo
+.claude
+.windsurf
+.agents

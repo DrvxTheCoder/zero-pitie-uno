@@ -20,10 +20,20 @@ const passHash = `${salt.toString("hex")}:${scryptSync(password, salt, 32).toStr
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
-await db.admin.upsert({
-  where: { username },
-  create: { username, passHash },
-  update: { passHash },
-});
+try {
+  await db.admin.upsert({
+    where: { username },
+    create: { username, passHash },
+    update: { passHash },
+  });
+} catch (err) {
+  // P2021: table missing, i.e. the migrations were never applied to this database.
+  if ((err as { code?: string }).code === "P2021") {
+    console.error('Tables are missing. Apply the migrations first: "pnpm db:deploy" (or "pnpm setup" to migrate + seed).');
+    await db.$disconnect();
+    process.exit(1);
+  }
+  throw err;
+}
 console.log(`Admin "${username}" is ready.`);
 await db.$disconnect();

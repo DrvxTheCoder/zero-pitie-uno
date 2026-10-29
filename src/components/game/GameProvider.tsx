@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/components/providers/I18nProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import { cues, unlockAudio } from "@/lib/sound";
+import { cues, releaseAudioSession, unlockAudio } from "@/lib/sound";
 import type { PlayerDTO } from "@/lib/types";
 import { QuickEntry } from "./QuickEntry";
 import { TimedGame } from "./TimedGame";
@@ -49,7 +49,8 @@ export function GameProvider({
         return;
       }
       if (next === "timer") {
-        unlockAudio();
+        // First thing in the tap: iOS only unlocks audio synchronously inside the gesture.
+        unlockAudio({ playback: true });
         cues.start();
       }
       setMode(next);
@@ -57,7 +58,10 @@ export function GameProvider({
     [players.length, router, t, toast],
   );
 
-  const close = useCallback(() => setMode(null), []);
+  const close = useCallback(() => {
+    setMode(null);
+    releaseAudioSession();
+  }, []);
 
   const handleSaved = useCallback(
     (winner: string, loser: string) => {
@@ -65,6 +69,8 @@ export function GameProvider({
       setSavedAt(Date.now());
       toast(t.game.saved(winner, loser));
       cues.saved();
+      // Let the chime finish before handing the iOS audio session back.
+      setTimeout(releaseAudioSession, 400);
       router.push("/");
       router.refresh();
     },

@@ -34,7 +34,7 @@ export function GameTopBar({ leagueName, onQuit }: { leagueName: string; onQuit:
     setSound(next);
     setSoundOn(next);
     if (next) {
-      unlockAudio();
+      unlockAudio({ playback: true });
       cues.toggle();
     }
   }
