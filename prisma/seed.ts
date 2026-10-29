@@ -3,7 +3,7 @@
 // Running it again updates that admin's password.
 import "dotenv/config";
 import { randomBytes, scryptSync } from "node:crypto";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.ts";
 
 const username = (process.env.ADMIN_USERNAME || "admin").trim();
@@ -18,9 +18,7 @@ if (password.length < 8) {
 const salt = randomBytes(16);
 const passHash = `${salt.toString("hex")}:${scryptSync(password, salt, 32).toString("hex")}`;
 
-const db = new PrismaClient({
-  adapter: new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? "file:./data/zeropitie.db" }),
-});
+const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
 await db.admin.upsert({
   where: { username },

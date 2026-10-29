@@ -1,6 +1,6 @@
 # Zéro Pitié — UNO No Mercy league
 
-Leaderboard for UNO No Mercy games. Next.js 16 · TypeScript · Tailwind CSS 4 · Prisma 7 · SQLite. Installable as a PWA.
+Leaderboard for UNO No Mercy games. Next.js 16 · TypeScript · Tailwind CSS 4 · Prisma 7 · PostgreSQL. Installable as a PWA.
 
 - **Leagues** are the accounts: each friend group logs in with a league name and password.
 - **Games**: "Démarrer" opens a 5-minute rolling timer that gets livelier as time runs out. At zero there's a time's-up burst, then you pick the winner (+1) and the loser (−1).
@@ -10,33 +10,30 @@ Leaderboard for UNO No Mercy games. Next.js 16 · TypeScript · Tailwind CSS 4 �
 
 ## Getting started
 
-```bash
-cp .env.example .env        # set ADMIN_PASSWORD (8+ characters)
-npm install                 # also generates the Prisma client
-npm run setup               # applies migrations + creates the admin account
-npm run dev                 # http://localhost:3000
-```
-
-The admin account is the only thing the seed creates. It reads `ADMIN_USERNAME` (default `admin`) and `ADMIN_PASSWORD` from `.env`. Running `npm run db:seed` again resets that admin's password to the current `.env` value.
-
-Production: `npm run build && npm start`.
-
-### Docker
+Needs Node 22.13+, pnpm 10 and a PostgreSQL database.
 
 ```bash
-echo 'ADMIN_PASSWORD=change-me-please' > .env
-docker compose up -d --build
+cp .env.example .env        # set DATABASE_URL and ADMIN_PASSWORD (8+ characters)
+pnpm install                # also generates the Prisma client
+pnpm run setup              # applies migrations + creates the admin account
+pnpm dev                    # http://localhost:3000
 ```
 
-On each start the container applies migrations, re-syncs the admin from the environment, and starts on port 3000. The database lives in the `zp-data` volume. Put it behind your reverse proxy with HTTPS (needed for the PWA install prompt). Cookies switch to `Secure` automatically when the proxy sends `X-Forwarded-Proto: https`.
+The admin account is the only thing the seed creates. It reads `ADMIN_USERNAME` (default `admin`) and `ADMIN_PASSWORD` from `.env`. Running `pnpm run db:seed` again resets that admin's password to the current `.env` value.
 
-`TZ` (default `Africa/Dakar`) sets the server time zone, so server-rendered dates match what phones show.
+Use `pnpm run setup`, not `pnpm setup` (a built-in pnpm command).
+
+### Production
+
+`pnpm build`, then `pnpm start`. `start` applies pending migrations, re-syncs the admin from the environment, and serves on `$PORT` (default 3000). On Coolify, the default Railpack build runs exactly that; just set the environment variables below.
+
+Put it behind HTTPS (needed for the PWA install prompt). Cookies switch to `Secure` automatically when the proxy sends `X-Forwarded-Proto: https`. `TZ` (e.g. `Africa/Dakar`) sets the server time zone, so server-rendered dates match what phones show.
 
 ### Environment
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DATABASE_URL` | `file:./data/zeropitie.db` | SQLite file |
+| `DATABASE_URL` | (required) | PostgreSQL connection string |
 | `ADMIN_USERNAME` | `admin` | Back-office login (seed) |
 | `ADMIN_PASSWORD` | (required) | Back-office password (seed) |
 | `ALLOW_SIGNUP` | `true` | `false` = only the back office can create leagues |
@@ -44,7 +41,7 @@ On each start the container applies migrations, re-syncs the admin from the envi
 
 ### Database changes
 
-Edit `prisma/schema.prisma`, then `npm run db:migrate -- --name what_changed`. That creates a migration in `prisma/migrations` and applies it locally.
+Edit `prisma/schema.prisma`, then `pnpm run db:migrate --name what_changed`. That creates a migration in `prisma/migrations` and applies it locally.
 
 ## Project structure
 
@@ -87,7 +84,7 @@ src/
     sound.ts                 beeps and vibration cues
     i18n/                    fr.ts (source), en.ts
     server/                  session cookies, passwords, validation, rate limit, queries
-    db.ts                    Prisma client (better-sqlite3 adapter)
+    db.ts                    Prisma client (pg adapter)
 ```
 
 Where to change things:
