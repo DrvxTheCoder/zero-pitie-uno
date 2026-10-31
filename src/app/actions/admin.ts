@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { runAction } from "@/lib/server/action";
+import { leagueTag } from "@/lib/server/queries";
 import { hashPassword, verifyPassword } from "@/lib/server/passwords";
 import { assertNotThrottled, recordFailure } from "@/lib/server/rate-limit";
 import { endAdminSession, requireAdminAction, startAdminSession } from "@/lib/server/session";
@@ -51,7 +52,7 @@ export async function adminDeleteLeague(leagueId: string) {
   return runAction(async () => {
     await requireAdminAction();
     await db.league.deleteMany({ where: { id: leagueId } });
-    revalidatePath("/", "layout");
+    updateTag(leagueTag(leagueId));
   });
 }
 
@@ -59,7 +60,9 @@ export async function adminDeleteLeague(leagueId: string) {
 export async function adminDeletePlayer(playerId: string) {
   return runAction(async () => {
     await requireAdminAction();
+    const player = await db.player.findUnique({ where: { id: playerId }, select: { leagueId: true } });
+    if (!player) return;
     await db.player.deleteMany({ where: { id: playerId } });
-    revalidatePath("/", "layout");
+    updateTag(leagueTag(player.leagueId));
   });
 }

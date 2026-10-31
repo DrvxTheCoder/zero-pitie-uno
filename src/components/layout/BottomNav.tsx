@@ -54,7 +54,7 @@ export function BottomNav() {
         <i className="-mt-[34px] grid size-[66px] -rotate-8 place-items-center rounded-full border-4 border-ink bg-yellow text-ink shadow-[0_0_0_3px_var(--color-yellow)]">
           <PlayIcon className="ml-[3px] size-[30px]" />
         </i>
-        {t.nav.play}
+        {/* {t.nav.play} */}
       </button>
       {link(players)}
       <button type="button" onClick={logout} aria-label={t.auth.logout} className={cn(itemClass, "text-paper")}>

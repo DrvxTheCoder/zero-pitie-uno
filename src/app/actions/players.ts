@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { runAction } from "@/lib/server/action";
+import { leagueTag } from "@/lib/server/queries";
 import { requireLeagueAction } from "@/lib/server/session";
 import { cleanName, fail, nameKey } from "@/lib/server/validation";
 
@@ -17,7 +18,7 @@ export async function addPlayer(name: string) {
     const clean = cleanName(name);
     await assertNameFree(league.id, clean);
     await db.player.create({ data: { leagueId: league.id, name: clean } });
-    revalidatePath("/", "layout");
+    updateTag(leagueTag(league.id));
   });
 }
 
@@ -28,7 +29,7 @@ export async function renamePlayer(playerId: string, name: string) {
     await assertNameFree(league.id, clean, playerId);
     const { count } = await db.player.updateMany({ where: { id: playerId, leagueId: league.id }, data: { name: clean } });
     if (!count) fail("generic");
-    revalidatePath("/", "layout");
+    updateTag(leagueTag(league.id));
   });
 }
 
@@ -36,6 +37,6 @@ export async function setPlayerActive(playerId: string, active: boolean) {
   return runAction(async () => {
     const league = await requireLeagueAction();
     await db.player.updateMany({ where: { id: playerId, leagueId: league.id }, data: { active } });
-    revalidatePath("/", "layout");
+    updateTag(leagueTag(league.id));
   });
 }

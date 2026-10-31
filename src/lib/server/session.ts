@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { newToken } from "./passwords";
@@ -41,6 +42,8 @@ export async function endLeagueSession() {
 export const getCurrentLeague = cache(async () => {
   const token = (await cookies()).get(LEAGUE_COOKIE)?.value;
   if (!token) return null;
+  // Expiry depends on the clock: always evaluate per request, never in a prerender
+  await connection();
   const minCreated = new Date(Date.now() - LEAGUE_SESSION_DAYS * 86_400_000);
   const session = await db.session.findFirst({
     where: { token, createdAt: { gt: minCreated } },
@@ -79,6 +82,7 @@ export async function endAdminSession() {
 export const getCurrentAdmin = cache(async () => {
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
   if (!token) return null;
+  await connection();
   const minCreated = new Date(Date.now() - ADMIN_SESSION_HOURS * 3_600_000);
   const session = await db.adminSession.findFirst({
     where: { token, createdAt: { gt: minCreated } },

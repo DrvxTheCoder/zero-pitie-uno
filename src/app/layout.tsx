@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
 };
 
+/**
+ * Every page depends on cookies (language here, the league or admin session below), so none
+ * can be prerendered: let them block on the server. Speed comes from the cached league data
+ * (see getLeagueSnapshot), the client router cache and the loading skeletons.
+ */
+export const instant = false;
+
 export const viewport: Viewport = {
   themeColor: "#d41e24",
   width: "device-width",

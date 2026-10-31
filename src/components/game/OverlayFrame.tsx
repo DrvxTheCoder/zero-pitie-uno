@@ -35,7 +35,7 @@ export function OverlayFrame({ phase, paused, flash, spinSeconds, wobbleSeconds 
       style={{ "--spin": `${spinSeconds}s`, "--wob": `${wobbleSeconds}s` } as CSSProperties}
     >
       <ArenaBackground center="50%" className="group-data-[flash=true]/ov:brightness-30" />
-      <div className="relative z-3 flex items-center justify-between gap-2.5 pt-[calc(12px+env(safe-area-inset-top,0px))] pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
+      <div className="relative z-3 flex items-center justify-between gap-2.5 pt-[calc(28px+env(safe-area-inset-top,0px))] pr-[max(16px,env(safe-area-inset-right,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
         {topBar}
       </div>
       <div
